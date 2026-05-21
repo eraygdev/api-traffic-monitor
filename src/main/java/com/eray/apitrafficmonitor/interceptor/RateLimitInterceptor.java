@@ -33,8 +33,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         LocalDateTime oneMinAgo =  LocalDateTime.now().minusMinutes(1);
         long rCount = logRepository.countByIpAddressAndTimestampAfter(ipAddress, oneMinAgo);
 
-        if(rCount < 10) {
-            
+        if(rCount > 5) {
+            response.setStatus(429);
+            return false;
         }
 
         return true;
