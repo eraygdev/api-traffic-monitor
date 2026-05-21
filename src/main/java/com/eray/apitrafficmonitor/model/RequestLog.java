@@ -18,6 +18,9 @@ public class RequestLog {
 
     private String ipAddress;
     private String endpoint;
+    private String reason;
+    private String message;
+
     private LocalDateTime timestamp;
 
     @PrePersist
