@@ -9,3 +9,9 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
+      
+  redis:
+    image: redis:alpine
+    container_name: api_redis
+    ports:
+      - "6379:6379"

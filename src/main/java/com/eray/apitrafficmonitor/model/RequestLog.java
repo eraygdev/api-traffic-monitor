@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor // Bunu ekle
+@AllArgsConstructor
 public class RequestLog {
 
     @Id
@@ -24,6 +24,4 @@ public class RequestLog {
     protected void onCreate() {
         timestamp = LocalDateTime.now();
     }
-    
-    // @Builder'ı sildik, bunun yerine constructor kullanacağız.
 }
