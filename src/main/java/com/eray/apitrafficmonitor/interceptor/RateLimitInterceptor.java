@@ -1,7 +1,5 @@
 package com.eray.apitrafficmonitor.interceptor;
 
-import com.eray.apitrafficmonitor.model.RequestLog;
-import com.eray.apitrafficmonitor.repository.LogRepository;
 import com.eray.apitrafficmonitor.service.LogService;
 
 import jakarta.servlet.http.HttpServletRequest;
