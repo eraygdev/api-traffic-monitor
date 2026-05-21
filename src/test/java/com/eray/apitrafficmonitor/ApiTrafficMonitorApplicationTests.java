@@ -1,10 +1,10 @@
-package com.eray.backend_project;
+package com.eray.apitrafficmonitor;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BackendProjectApplicationTests {
+class ApiTrafficMonitorApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,13 +1,13 @@
-package com.eray.backend_project;
+package com.eray.apitrafficmonitor;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BackendProjectApplication {
+public class ApiTrafficMonitorApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BackendProjectApplication.class, args);
+		SpringApplication.run(ApiTrafficMonitorApplication.class, args);
 	}
 
 }
