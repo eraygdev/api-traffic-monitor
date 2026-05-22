@@ -2,6 +2,7 @@ package com.eray.apitrafficmonitor.interceptor;
 
 import com.eray.apitrafficmonitor.constant.AppConstants;
 import com.eray.apitrafficmonitor.service.LogService;
+import com.eray.apitrafficmonitor.service.RateLimitService;
 import com.eray.apitrafficmonitor.service.LogService.LogType;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,13 +20,16 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
     /*  --- Log Templates ---
-                         Template:     Req: [IP] | [Endpoint] | [Result] | [Active Users] */
+                                       Req: [IP] | [Endpoint] | [Result] | [Active Users] */
     private static final String LOG_TEMPLATE_S = "Success: {} | {} | {} | {}";
     private static final String LOG_TEMPLATE_E = "Error  : {} | {} | {} | {}";
     private static final Logger logger = LoggerFactory.getLogger(RateLimitInterceptor.class);
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private RateLimitService rateLimitService;
 
     @Autowired
     private LogService logService;
@@ -42,32 +46,22 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
-
-        request.setAttribute(AppConstants.NEW_USER_ATTRIBUTE, true);
-        if(redisTemplate.opsForValue().increment(AppConstants.ACTIVE_USERS_KEY) >= AppConstants.MAX_ACTIVE_USER) {
-            redisTemplate.opsForValue().decrement(AppConstants.ACTIVE_USERS_KEY);
-
+        
+        String activeUsersStr = redisTemplate.opsForValue().get(AppConstants.ACTIVE_USERS_KEY);
+        if (activeUsersStr != null && Long.parseLong(activeUsersStr) >= AppConstants.MAX_ACTIVE_USER) {
             response.setStatus(503);
             return false;
         }
 
-        String ipAddress = request.getRemoteAddr();
-        String endpoint = request.getRequestURI();
-        
-        String key = AppConstants.REDIS_KEY_PREFIX + ipAddress;
-        long count = redisTemplate.opsForValue().increment(key);
+        String ip = request.getRemoteAddr();
 
-        if(count == 1) {
-            redisTemplate.expire(key, Duration.ofMinutes(AppConstants.RATE_LIMIT_WINDOW_MINUTES));
-        }
-
-        if(count > AppConstants.BLOCK_THRESHOLD){
+        if(rateLimitService.isBlocked(ip)){
             response.setStatus(403);
-            logService.saveLog(ipAddress, endpoint, LogType.SECURITY, "Request limit exceeded! :" + count);
+            logService.saveLog(ip, request.getRequestURI(), LogType.SECURITY, "Blocked IP access attempt.");
             return false;
         }   
 
-        else if(count > AppConstants.RATE_LIMIT_THRESHOLD){
+        else if(!rateLimitService.isRequestAllowed(ip)){
             response.setStatus(429);
             return false;
         }   
